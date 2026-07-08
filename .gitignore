@@ -1,0 +1,23 @@
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+
+# React
+frontend/node_modules/
+
+# Environment variables
+backend/.env
+
+# ChromaDB
+backend/chroma_db/
+
+# Uploads
+backend/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
