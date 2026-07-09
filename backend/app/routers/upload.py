@@ -10,6 +10,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, status
 
 from app.services.pdf_service import extract_text_from_pdf, PDFExtractionError
 from app.services.chunk_service import chunk_text
+from app.services.embedding_service import generate_embeddings
 # ---------------------------------------------------------------------------
 # Router setup
 # ---------------------------------------------------------------------------
@@ -102,6 +103,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     try:
         extracted_pages = extract_text_from_pdf(str(destination_path))
         chunks = chunk_text(extracted_pages)
+        embedded_chunks = generate_embeddings(chunks)
     except PDFExtractionError as e:
         # The file was saved but couldn't be processed — clean it up so
         # we don't leave an unusable PDF sitting in the uploads folder.
@@ -116,5 +118,6 @@ async def upload_pdf(file: UploadFile = File(...)):
     "size_bytes": size_bytes,
     "total_pages_extracted": len(extracted_pages),
     "total_chunks": len(chunks),
-    "message": "File uploaded and processed successfully."
+    "total_embeddings": len(embedded_chunks),
+    "message": "Embeddings generated successfully."
 }
