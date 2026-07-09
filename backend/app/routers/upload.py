@@ -8,6 +8,8 @@ from pathlib import Path
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
 
+from app.services.pdf_service import extract_text_from_pdf, PDFExtractionError
+
 # ---------------------------------------------------------------------------
 # Router setup
 # ---------------------------------------------------------------------------
@@ -52,10 +54,11 @@ def validate_pdf(file: UploadFile) -> None:
 @router.post("/")
 async def upload_pdf(file: UploadFile = File(...)):
     """
-    Upload a single PDF file and save it to the uploads directory.
+    Upload a single PDF file, save it to disk, and extract its text content.
 
     Returns:
-        JSON with filename, size in bytes, and a success message.
+        JSON with filename, size in bytes, number of pages with extracted
+        text, and a success message.
     """
     # 1. Validate file type before touching the filesystem
     validate_pdf(file)
@@ -67,9 +70,8 @@ async def upload_pdf(file: UploadFile = File(...)):
     safe_filename = os.path.basename(file.filename)
     destination_path = UPLOAD_DIR / safe_filename
 
+    # --- Save the file to disk ---------------------------------------------
     try:
-        # Stream the file to disk in chunks instead of loading it fully
-        # into memory, and enforce the max size limit while doing so.
         size_bytes = 0
         with open(destination_path, "wb") as buffer:
             while chunk := await file.read(1024 * 1024):  # 1MB chunks
@@ -96,10 +98,22 @@ async def upload_pdf(file: UploadFile = File(...)):
     finally:
         await file.close()
 
+    # --- Extract text from the saved PDF ------------------------------------
+    try:
+        extracted_pages = extract_text_from_pdf(str(destination_path))
+    except PDFExtractionError as e:
+        # The file was saved but couldn't be processed — clean it up so
+        # we don't leave an unusable PDF sitting in the uploads folder.
+        destination_path.unlink(missing_ok=True)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"PDF uploaded but text extraction failed: {str(e)}",
+        )
+
     return {
-    "success": True,
     "filename": safe_filename,
     "size_bytes": size_bytes,
-    "path": str(destination_path),
-    "message": "File uploaded successfully."
+    "total_pages_extracted": len(extracted_pages),
+    "pages": extracted_pages,
+    "message": "File uploaded and processed successfully."
 }
