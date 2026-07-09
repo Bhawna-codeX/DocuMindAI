@@ -66,7 +66,10 @@ def _batch(items: List[Dict[str, object]], batch_size: int) -> List[List[Dict[st
     return [items[i:i + batch_size] for i in range(0, len(items), batch_size)]
 
 
-def generate_embeddings(chunks: List[Dict[str, object]]) -> List[Dict[str, object]]:
+def generate_embeddings(
+    chunks: List[Dict[str, object]],
+    task_type: str = "RETRIEVAL_DOCUMENT",
+) -> List[Dict[str, object]]:
     """
     Generate embeddings for a list of text chunks using Gemini's embedding model.
 
@@ -101,7 +104,7 @@ def generate_embeddings(chunks: List[Dict[str, object]]) -> List[Dict[str, objec
             response = client.models.embed_content(
                 model=GEMINI_EMBEDDING_MODEL,
                 contents=texts,
-                config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
+                config=types.EmbedContentConfig(task_type=task_type),
             )
         except Exception as e:
             raise EmbeddingGenerationError(

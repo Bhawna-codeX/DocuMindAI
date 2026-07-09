@@ -31,6 +31,9 @@ class InvalidChunkDataError(Exception):
     """Raised when input chunk data is missing required fields (e.g. embedding)."""
     pass
 
+class ChromaQueryError(Exception):
+    """Raised when a similarity search against ChromaDB fails."""
+    pass
 
 def _get_collection() -> Collection:
     """
@@ -161,3 +164,44 @@ def store_embeddings(
         )
 
     return len(ids)
+
+def query_collection(
+    query_embedding: List[float],
+    top_k: int = 5,
+) -> List[Dict[str, object]]:
+    """
+    Run a similarity search against the 'documind_collection' using a
+    precomputed query embedding, and return the closest matching chunks.
+    """
+    if not isinstance(query_embedding, (list, tuple)) or len(query_embedding) == 0:
+        raise InvalidChunkDataError("query_embedding must be a non-empty list of floats.")
+    if top_k <= 0:
+        raise InvalidChunkDataError("top_k must be greater than 0.")
+
+    collection = _get_collection()
+
+    try:
+        results = collection.query(
+            query_embeddings=[list(query_embedding)],
+            n_results=top_k,
+            include=["documents", "metadatas", "distances"],
+        )
+    except Exception as e:
+        raise ChromaQueryError(f"ChromaDB similarity search failed: {str(e)}")
+
+    documents = (results.get("documents") or [[]])[0]
+    metadatas = (results.get("metadatas") or [[]])[0]
+    distances = (results.get("distances") or [[]])[0]
+
+    matches: List[Dict[str, object]] = []
+    for text, metadata, distance in zip(documents, metadatas, distances):
+        metadata = metadata or {}
+        matches.append({
+            "text": text,
+            "page": metadata.get("page"),
+            "chunk_id": metadata.get("chunk_id"),
+            "source_document": metadata.get("source_document"),
+            "distance": distance,
+        })
+
+    return matches
