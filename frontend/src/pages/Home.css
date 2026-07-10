@@ -1,0 +1,153 @@
+.home {
+  min-height: calc(100vh - 72px);
+  padding: 40px 60px;
+  background: linear-gradient(
+    180deg,
+    var(--bg-primary),
+    var(--bg-secondary)
+);
+}
+
+/* =========================
+   Hero Section
+========================= */
+
+.hero {
+  text-align: center;
+  margin-bottom: 55px;
+}
+
+.hero h1 {
+  margin-bottom: 10px;
+
+  font-size: clamp(2rem,4vw,3rem);
+
+  font-weight: 800;
+
+  line-height: 1.1;
+
+  background: linear-gradient(
+    90deg,
+    #93c5fd,
+    #3b82f6,
+    #60a5fa
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero p {
+  max-width: 760px;
+
+  margin: auto;
+
+  color: var(--text-secondary);
+
+  font-size: 18px;
+
+  line-height: 1.8;
+
+  opacity: .95;
+}
+
+/* =========================
+   Dashboard Layout
+========================= */
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);;
+  gap: 32px;
+  align-items: start;
+  margin-top: 60px;
+}
+
+/* =========================
+   Panels
+========================= */
+
+.upload-panel,
+.chat-panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+
+  border-radius: 24px;
+
+  padding: 28px;
+
+  border:1px solid var(--border-color);
+
+  box-shadow: var(--shadow);
+
+  transition: all 0.25s ease;
+}
+
+.upload-panel:hover,
+.chat-panel:hover {
+
+  transform: translateY(-6px);
+
+  box-shadow:
+    0 24px 50px rgba(0,0,0,.18);
+
+}
+
+.upload-panel {
+  position: sticky;
+  top: 100px;
+}
+
+.chat-panel {
+  min-height: 560px;
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1000px) {
+
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .upload-panel {
+    position: static;
+  }
+
+  .home {
+    padding: 24px;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  .chat-panel {
+    min-height: auto;
+  }
+
+  .hero,
+.upload-panel,
+.chat-panel {
+  animation: fadeUp .6s ease;
+}
+
+@keyframes fadeUp {
+
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+}

@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import ChatBubble from "./ChatBubble";
 import "./ChatSection.css";
 
 const ChatSection = ({ documentName }) => {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
-  const [answer, setAnswer] = useState(null);
-  const [sources, setSources] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
+
+  const messagesEndRef = useRef(null);
+
+  // Auto-scroll to the latest message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages, loading]);
 
   const handleAsk = async () => {
     if (!documentName) {
@@ -17,23 +26,38 @@ const ChatSection = ({ documentName }) => {
 
     if (!question.trim()) return;
 
-    setLoading(true);
+    const currentQuestion = question.trim();
+
+    // Add user message
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        text: currentQuestion,
+      },
+    ]);
+
+    setQuestion("");
     setError(null);
-    setAnswer(null);
-    setSources([]);
+    setLoading(true);
 
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/chat/",
         {
-          question,
+          question: currentQuestion,
           document_name: documentName,
         }
       );
 
-      setAnswer(response.data.answer);
-      setSources(response.data.sources || []);
-      setQuestion("");
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "ai",
+          text: response.data.answer,
+          sources: response.data.sources || [],
+        },
+      ]);
     } catch (err) {
       const backendMessage =
         err.response?.data?.detail ||
@@ -49,51 +73,86 @@ const ChatSection = ({ documentName }) => {
 
   return (
     <div className="chat-section">
-      <h2 className="chat-title">Ask Questions</h2>
+      <div className="chat-card">
+        <h2 className="chat-title">Ask Questions</h2>
 
-      <textarea
-        className="chat-input"
-        placeholder="Ask anything about your uploaded document..."
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        rows={4}
-      />
+        <p className="chat-subtitle">
+          Ask anything about your uploaded PDF. DocuMind AI answers only from
+          the uploaded document using Retrieval-Augmented Generation.
+        </p>
 
-      <button
-        className="chat-button"
-        onClick={handleAsk}
-        disabled={loading || !documentName}
-      >
-        {loading ? "Thinking..." : "Ask AI"}
-      </button>
+        {/* Conversation */}
+        <div className="chat-messages">
+          {messages.map((msg, index) => (
+            <div key={`${msg.role}-${index}`}>
+              <ChatBubble
+                type={msg.role}
+                message={msg.text}
+              />
 
-      {error && (
-        <div className="chat-error">
-          <strong>Error:</strong> {error}
-        </div>
-      )}
+              {msg.role === "ai" &&
+                msg.sources &&
+                msg.sources.length > 0 && (
+                  <div className="sources">
+                    <div className="sources-title">
+                      Sources
+                    </div>
 
-      {answer && (
-        <div className="chat-answer-card">
-          <h3>Answer</h3>
-
-          <p>{answer}</p>
-
-          {sources.length > 0 && (
-            <div className="chat-sources">
-              <strong>Sources</strong>
-
-              <ul>
-                {sources.map((source, index) => (
-                  <li key={index}>
-                    📄 {source.source_document} — Page {source.page}
-                  </li>
-                ))}
-              </ul>
+                    <ul className="sources-list">
+                      {msg.sources.map((source, i) => (
+                        <li key={`${source.source_document}-${source.page}-${i}`}>
+                          📄 <strong>{source.source_document}</strong> — Page{" "}
+                          {source.page}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
             </div>
+          ))}
+
+          {/* Typing Indicator */}
+          {loading && (
+            <ChatBubble
+              type="ai"
+              loading={true}
+            />
           )}
+
+          {/* Auto Scroll Target */}
+          <div ref={messagesEndRef}></div>
         </div>
-      )}
+
+        <div className="chat-input-container">
+  <textarea
+    className="chat-input-modern"
+    placeholder="Ask anything about your uploaded document..."
+    value={question}
+    onChange={(e) => setQuestion(e.target.value)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleAsk();
+      }
+    }}
+    rows={2}
+  />
+
+  <button
+    className="send-button"
+    onClick={handleAsk}
+    disabled={loading || !documentName}
+  >
+    {loading ? "..." : "➜"}
+  </button>
+</div>
+
+        {error && (
+          <div className="error-card">
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

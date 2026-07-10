@@ -1,15 +1,24 @@
 import "./Navbar.css";
 
-function Navbar() {
+function Navbar({ theme, toggleTheme }) {
   return (
     <nav className="navbar">
-      <div className="logo">
-        📄 <span>DocuMind AI</span>
+
+      <div className="navbar-logo">
+        📄 DocuMind AI
       </div>
 
-      <div className="nav-right">
-        AI Powered PDF Assistant
+      <div className="navbar-actions">
+
+        <button
+          className="theme-toggle"
+          onClick={toggleTheme}
+        >
+          {theme === "light" ? "🌙" : "☀️"}
+        </button>
+
       </div>
+
     </nav>
   );
 }

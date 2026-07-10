@@ -1,15 +1,31 @@
 import React from "react";
 import "./ChatBubble.css";
 
-const ChatBubble = ({ type, message }) => {
+const ChatBubble = ({ type, message, loading = false }) => {
+  const isUser = type === "user";
+
   return (
-    <div className={`chat-bubble ${type}`}>
+    <div className={`chat-bubble ${isUser ? "user" : "ai"}`}>
       <div className="chat-avatar">
-        {type === "user" ? "🧑" : "🤖"}
+        {isUser ? "🧑" : "🤖"}
       </div>
 
-      <div className="chat-message">
-        {message}
+      <div className="chat-content">
+        <div className="chat-sender">
+          {isUser ? "You" : "DocuMind AI"}
+        </div>
+
+        {loading ? (
+          <div className="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        ) : (
+          <div className="chat-message">
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );

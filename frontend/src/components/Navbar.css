@@ -1,57 +1,114 @@
+/* =========================
+   Navbar
+========================= */
+
 .navbar {
-  width: 100%;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
   position: sticky;
   top: 0;
-  z-index: 100;
-}
-
-.navbar-container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 18px 30px;
+  z-index: 1000;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  padding: 18px 40px;
+
+  background: var(--navbar-bg);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-bottom: 1px solid var(--border-color);
+
+  transition: all 0.3s ease;
 }
+
+/* =========================
+   Logo
+========================= */
 
 .navbar-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
+  gap: 10px;
 
-.navbar-logo h2 {
-  margin: 0;
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 700;
-  color: #1d4ed8;
+
+  color: var(--text-primary);
+
+  user-select: none;
 }
 
-.logo-icon {
-  font-size: 32px;
+/* =========================
+   Right Side
+========================= */
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
 }
 
-.navbar-right {
-  color: #6b7280;
-  font-size: 15px;
-  font-weight: 500;
+/* =========================
+   Theme Button
+========================= */
+
+.theme-toggle {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+
+  background: var(--card-bg);
+
+  color: var(--text-primary);
+
+  font-size: 22px;
+
+  cursor: pointer;
+
+  box-shadow: var(--shadow);
+
+  transition: all 0.25s ease;
 }
 
-@media (max-width:768px){
+.theme-toggle:hover {
+  transform: rotate(20deg) scale(1.08);
 
-.navbar-container{
-padding:18px;
+  background: var(--bg-secondary);
+
+  border-color: var(--primary);
 }
 
-.navbar-right{
-display:none;
+.theme-toggle:active {
+  transform: scale(0.95);
 }
 
-.navbar-logo h2{
-font-size:24px;
-}
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 768px) {
+
+  .navbar {
+    padding: 16px 20px;
+  }
+
+  .navbar-logo {
+    font-size: 20px;
+  }
+
+  .theme-toggle {
+    width: 42px;
+    height: 42px;
+
+    font-size: 18px;
+  }
 
 }

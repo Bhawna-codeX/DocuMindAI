@@ -1,169 +1,167 @@
-.chat-section {
-  width: 100%;
-  max-width: 900px;
-  margin: 40px auto;
+/* =========================
+   Chat Bubble
+========================= */
+
+.chat-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
 }
 
-.chat-input-card {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 8px 30px rgba(0,0,0,.05);
+/* =========================
+   Avatar
+========================= */
+
+.chat-avatar {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 22px;
+
+  flex-shrink: 0;
+
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--primary-hover)
+  );
+
+  color: white;
+
+  box-shadow: var(--shadow);
 }
 
-.chat-title {
-  font-size: 26px;
+/* =========================
+   Content
+========================= */
+
+.chat-content {
+  flex: 1;
+}
+
+.chat-sender {
+  font-size: 14px;
   font-weight: 700;
-  color: #111827;
-  margin-bottom: 20px;
+
+  color: var(--text-primary);
+
+  margin-bottom: 8px;
 }
 
-.chat-textarea {
-  width: 100%;
-  min-height: 130px;
-  resize: vertical;
+.chat-message {
+  display: inline-block;
 
-  border: 1px solid #d1d5db;
-  border-radius: 14px;
+  max-width: 100%;
 
-  padding: 16px;
-  font-size: 15px;
+  padding: 16px 20px;
 
-  outline: none;
+  border-radius: 18px;
 
-  transition: .25s;
+  line-height: 1.7;
+
+  white-space: pre-wrap;
+
+  word-break: break-word;
+
+  box-shadow: var(--shadow);
+
+  transition: .3s ease;
 }
 
-.chat-textarea:focus{
-border-color:#2563eb;
-box-shadow:0 0 0 4px rgba(37,99,235,.15);
+/* =========================
+   User Message
+========================= */
+
+.user .chat-message {
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--primary-hover)
+  );
+
+  color: white;
 }
 
-.ask-button{
+/* =========================
+   AI Message
+========================= */
 
-margin-top:20px;
+.ai .chat-message {
+  background: var(--message-ai);
 
-padding:14px 30px;
+  color: var(--text-primary);
 
-border:none;
-
-border-radius:12px;
-
-background:#2563eb;
-
-color:white;
-
-font-size:15px;
-
-font-weight:600;
-
-cursor:pointer;
-
-transition:.25s;
-
+  border: 1px solid var(--border-color);
 }
 
-.ask-button:hover{
+/* =========================
+   Timestamp
+========================= */
 
-background:#1d4ed8;
+.chat-time {
+  margin-top: 8px;
 
-transform:translateY(-2px);
+  font-size: 12px;
 
+  color: var(--text-secondary);
 }
 
-.answer-card{
+/* =========================
+   Typing Indicator
+========================= */
 
-margin-top:25px;
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 
-padding:24px;
+  padding: 16px 20px;
 
-background:white;
+  background: var(--message-ai);
 
-border-radius:16px;
+  border: 1px solid var(--border-color);
 
-border-left:5px solid #2563eb;
+  border-radius: 18px;
 
-box-shadow:0 8px 25px rgba(0,0,0,.05);
-
+  width: fit-content;
 }
 
-.answer-title{
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
 
-font-size:20px;
+  border-radius: 50%;
 
-font-weight:700;
+  background: var(--text-secondary);
 
-margin-bottom:12px;
-
-color:#111827;
-
+  animation: typingBounce 1.2s infinite;
 }
 
-.answer-text{
-
-line-height:1.8;
-
-color:#374151;
-
-white-space:pre-wrap;
-
+.typing-indicator span:nth-child(2) {
+  animation-delay: .2s;
 }
 
-.sources{
-
-margin-top:20px;
-
-padding-top:15px;
-
-border-top:1px solid #e5e7eb;
-
+.typing-indicator span:nth-child(3) {
+  animation-delay: .4s;
 }
 
-.sources h4{
+@keyframes typingBounce {
 
-margin-bottom:10px;
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: .5;
+  }
 
-color:#111827;
-
-}
-
-.sources ul{
-
-padding-left:20px;
-
-}
-
-.sources li{
-
-margin-bottom:6px;
-
-color:#4b5563;
-
-}
-
-.loading{
-
-margin-top:20px;
-
-color:#2563eb;
-
-font-weight:600;
-
-}
-
-.error{
-
-margin-top:20px;
-
-padding:15px;
-
-background:#fef2f2;
-
-color:#dc2626;
-
-border-radius:10px;
-
-border:1px solid #fecaca;
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
 
 }
