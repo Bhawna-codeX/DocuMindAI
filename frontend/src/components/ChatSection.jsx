@@ -11,6 +11,7 @@ const ChatSection = ({ documentName }) => {
   const [error, setError] = useState(null);
 
   const messagesEndRef = useRef(null);
+  const sessionId = useRef(crypto.randomUUID());
 
   // Auto-scroll to the latest message
   useEffect(() => {
@@ -27,16 +28,20 @@ const ChatSection = ({ documentName }) => {
   }, 100);
 };
 
-  const handleAsk = async (customQuestion = null) => {
-    if (!documentName) {
-      setError("Please upload a PDF first.");
-      return;
-    }
+ const handleAsk = async (customQuestion = "") => {
 
-    if (!question.trim()) return;
+  if (typeof customQuestion !== "string") {
+  customQuestion = "";
+}
 
-    const currentQuestion = customQuestion || question.trim();
+  if (!documentName) {
+    setError("Please upload a PDF first.");
+    return;
+  }
 
+  const currentQuestion = customQuestion || question.trim();
+
+  if (!currentQuestion) return;
     // Add user message
     setMessages((prev) => [
       ...prev,
@@ -52,18 +57,23 @@ const ChatSection = ({ documentName }) => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/chat/",
+          "http://127.0.0.1:8000/chat/",
         {
-          question: currentQuestion,
-          document_name: documentName,
-        }
-      );
+            question: currentQuestion,
+            document_name: documentName,
+            session_id: sessionId.current,
+         }
+        );
 
+        console.log("Response from backend:", response.data);
       setMessages((prev) => [
         ...prev,
         {
           role: "ai",
-          text: response.data.answer,
+          text:
+            typeof response.data.answer === "string"
+              ? response.data.answer
+              : JSON.stringify(response.data.answer, null, 2),
           sources: response.data.sources || [],
         },
       ]);
@@ -212,10 +222,10 @@ const ChatSection = ({ documentName }) => {
   />
 
   <button
-    className="send-button"
-    onClick={handleAsk}
-    disabled={loading || !documentName}
-  >
+  className="send-button"
+  onClick={() => handleAsk()}
+  disabled={loading || !documentName}
+>
     {loading ? "..." : <FiSend />}
   </button>
 </div>

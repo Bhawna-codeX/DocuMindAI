@@ -25,12 +25,10 @@ const ChatBubble = ({ type, message, loading = false }) => {
           </div>
         ) : (
           <div className="chat-message markdown-body">
-              <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-              >
-                 {message}
-              </ReactMarkdown>
-          </div>
+             
+                {String(message ?? "")}
+            </div>
+          
         )}
       </div>
     </div>
