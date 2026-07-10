@@ -166,7 +166,7 @@ def store_embeddings(
     return len(ids)
 
 def query_collection(
-    query_embedding: List[float],
+    query_embedding: List[float],document_name: str,
     top_k: int = 5,
 ) -> List[Dict[str, object]]:
     """
@@ -182,10 +182,13 @@ def query_collection(
 
     try:
         results = collection.query(
-            query_embeddings=[list(query_embedding)],
-            n_results=top_k,
-            include=["documents", "metadatas", "distances"],
-        )
+    query_embeddings=[list(query_embedding)],
+    n_results=top_k,
+    where={
+        "source_document": document_name
+    },
+    include=["documents", "metadatas", "distances"],
+)
     except Exception as e:
         raise ChromaQueryError(f"ChromaDB similarity search failed: {str(e)}")
 

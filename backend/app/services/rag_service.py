@@ -49,7 +49,7 @@ def _build_client() -> genai.Client:
     return genai.Client(api_key=_load_api_key())
 
 
-def retrieve_relevant_chunks(question: str, top_k: int = DEFAULT_TOP_K) -> List[Dict[str, object]]:
+def retrieve_relevant_chunks(question: str,document_name: str, top_k: int = DEFAULT_TOP_K) -> List[Dict[str, object]]:
     """Embed the question (via embedding_service) and search ChromaDB (via chroma_service)."""
     if not question or not question.strip():
         raise RetrievalError("question must be a non-empty string.")
@@ -69,7 +69,7 @@ def retrieve_relevant_chunks(question: str, top_k: int = DEFAULT_TOP_K) -> List[
     question_embedding = embedded[0]["embedding"]
 
     try:
-        matches = query_collection(query_embedding=question_embedding, top_k=top_k)
+        matches = query_collection(query_embedding=question_embedding,document_name=document_name, top_k=top_k)
     except (InvalidChunkDataError, ChromaQueryError) as e:
         raise RetrievalError(f"Failed to retrieve relevant chunks: {str(e)}")
 
@@ -121,9 +121,9 @@ def generate_answer(question: str, context_chunks: List[Dict[str, object]]) -> s
     return answer_text.strip()
 
 
-def ask_question(question: str, top_k: int = DEFAULT_TOP_K) -> Dict[str, object]:
+def ask_question(question: str,document_name: str, top_k: int = DEFAULT_TOP_K) -> Dict[str, object]:
     """End-to-end RAG entry point: retrieve -> generate -> return question/answer/sources."""
-    context_chunks = retrieve_relevant_chunks(question, top_k=top_k)
+    context_chunks = retrieve_relevant_chunks(question,document_name, top_k=top_k)
     answer = generate_answer(question, context_chunks)
 
     sources = [
