@@ -6,13 +6,13 @@ const UploadBox = ({ setDocumentName }) => {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [success, setSuccess] = useState(null);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
 
   const inputRef = useRef(null);
 
   const resetMessages = () => {
-    setSuccess(null);
+    setSuccess(false);
     setError(null);
   };
 
@@ -38,8 +38,7 @@ const UploadBox = ({ setDocumentName }) => {
     e.preventDefault();
     setIsDragging(false);
 
-    const droppedFile = e.dataTransfer.files[0];
-    validateAndSetFile(droppedFile);
+    validateAndSetFile(e.dataTransfer.files[0]);
   };
 
   const handleDragOver = (e) => {
@@ -75,14 +74,9 @@ const UploadBox = ({ setDocumentName }) => {
         },
       });
 
-      setSuccess(
-        response.data.message ||
-          "Document uploaded and processed successfully."
-      );
+      setSuccess(true);
 
-      // IMPORTANT: Needed for ChatSection
       setDocumentName(response.data.filename);
-
     } catch (err) {
       const backendMessage =
         err.response?.data?.detail ||
@@ -146,7 +140,7 @@ const UploadBox = ({ setDocumentName }) => {
           />
 
           <path
-            d="M38 4v10a4 4 0 004 4h10"
+            d="M38 4v10a4 4 0 0 0 4 4h10"
             fill="#DCE8FF"
             stroke="#2F6FED"
             strokeWidth="2"
@@ -164,86 +158,64 @@ const UploadBox = ({ setDocumentName }) => {
         </svg>
 
         <p className="dropzone__text">
-          {file
+          {success
+            ? "PDF Indexed"
+            : file
             ? "File ready to upload"
             : "Click or drag PDF here"}
         </p>
 
         <p className="dropzone__hint">
-          PDF files only
+          {success
+            ? "Ready for questions"
+            : "PDF files only"}
         </p>
       </div>
 
       {file && (
-        <div className="filename-row">
-          <svg
-            className="filename-row__check"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="12"
-              fill="#16A34A"
-            />
+        <div className="document-card">
+          <div className="document-card__icon">
+            📄
+          </div>
 
-            <path
-              d="M7 12.5l3 3 7-7"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <div className="document-card__info">
+            <div className="document-card__name">
+              {file.name}
+            </div>
 
-          <span className="filename-row__name">
-            {file.name}
-          </span>
+            <div className="document-card__status">
+              {success ? (
+                <>
+                  <span className="status-dot"></span>
+                  Indexed • Ready to chat
+                </>
+              ) : (
+                <>
+                  <span className="status-dot pending"></span>
+                  Ready to upload
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
       <button
-        className="upload-button"
-        onClick={handleUpload}
-        disabled={uploading}
-      >
+  className={`upload-button ${success ? "upload-button--success" : ""}`}
+  onClick={handleUpload}
+  disabled={uploading}
+>
         {uploading ? (
           <span className="upload-button__loading">
             <span className="spinner"></span>
             Uploading...
           </span>
+        ) : success ? (
+          "Replace PDF"
         ) : (
           "Upload PDF"
         )}
       </button>
-
-      {success && (
-        <div className="message-card message-card--success">
-          <svg
-            className="message-card__icon"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="12"
-              fill="#16A34A"
-            />
-
-            <path
-              d="M7 12.5l3 3 7-7"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-
-          <span>{success}</span>
-        </div>
-      )}
 
       {error && (
         <div className="message-card message-card--error">

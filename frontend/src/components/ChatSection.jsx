@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { FiSend } from "react-icons/fi";
 import ChatBubble from "./ChatBubble";
 import "./ChatSection.css";
 
@@ -18,7 +19,15 @@ const ChatSection = ({ documentName }) => {
     });
   }, [messages, loading]);
 
-  const handleAsk = async () => {
+  const handleSuggestionClick = (suggestion) => {
+  setQuestion(suggestion);
+
+  setTimeout(() => {
+    handleAsk(suggestion);
+  }, 100);
+};
+
+  const handleAsk = async (customQuestion = null) => {
     if (!documentName) {
       setError("Please upload a PDF first.");
       return;
@@ -26,7 +35,7 @@ const ChatSection = ({ documentName }) => {
 
     if (!question.trim()) return;
 
-    const currentQuestion = question.trim();
+    const currentQuestion = customQuestion || question.trim();
 
     // Add user message
     setMessages((prev) => [
@@ -83,45 +92,109 @@ const ChatSection = ({ documentName }) => {
 
         {/* Conversation */}
         <div className="chat-messages">
-          {messages.map((msg, index) => (
-            <div key={`${msg.role}-${index}`}>
-              <ChatBubble
-                type={msg.role}
-                message={msg.text}
-              />
 
-              {msg.role === "ai" &&
-                msg.sources &&
-                msg.sources.length > 0 && (
-                  <div className="sources">
-                    <div className="sources-title">
-                      Sources
-                    </div>
+  {messages.length === 0 && !loading && (
+    <div className="empty-chat">
 
-                    <ul className="sources-list">
-                      {msg.sources.map((source, i) => (
-                        <li key={`${source.source_document}-${source.page}-${i}`}>
-                          📄 <strong>{source.source_document}</strong> — Page{" "}
-                          {source.page}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-            </div>
-          ))}
+      <div className="empty-chat-icon">
+        🤖
+      </div>
 
-          {/* Typing Indicator */}
-          {loading && (
-            <ChatBubble
-              type="ai"
-              loading={true}
-            />
-          )}
+      <h2>Welcome to DocuMind AI</h2>
 
-          {/* Auto Scroll Target */}
-          <div ref={messagesEndRef}></div>
-        </div>
+      <p>
+        Upload a PDF and ask intelligent questions using
+        Retrieval-Augmented Generation.
+      </p>
+
+      <div className="suggestions">
+
+        <div
+    className="suggestion-card"
+    onClick={() =>
+        handleSuggestionClick("Summarize this document.")
+    }
+>
+    📄 Summarize this document
+</div>
+
+        <div
+    className="suggestion-card"
+    onClick={() =>
+        handleSuggestionClick("What are the key points?")
+    }
+>
+    🔍 What are the key points?
+</div>
+
+       <div
+    className="suggestion-card"
+    onClick={() =>
+        handleSuggestionClick("List important dates.")
+    }
+>
+    📅 List important dates
+</div>
+
+      <div
+    className="suggestion-card"
+    onClick={() =>
+        handleSuggestionClick("Explain page 3.")
+    }
+>
+    💡 Explain page 3
+</div>
+
+      </div>
+
+    </div>
+  )}
+
+  {messages.map((msg, index) => (
+    <div key={`${msg.role}-${index}`}>
+      <ChatBubble
+        type={msg.role}
+        message={msg.text}
+      />
+
+      {msg.role === "ai" &&
+        msg.sources &&
+        msg.sources.length > 0 && (
+        <div className="sources">
+  <div className="sources-title">
+    Sources
+  </div>
+
+  {msg.sources.length > 0 && (
+    <div className="source-document">
+      📄 {msg.sources[0].source_document}
+    </div>
+  )}
+
+  <ul className="sources-list">
+    {msg.sources.map((source, i) => (
+      <li key={i}>
+        Page {source.page}
+      </li>
+    ))}
+  </ul>
+</div>
+        )}
+    </div>
+  ))}
+
+  {loading && (
+    <ChatBubble
+      type="ai"
+      loading={true}
+    />
+  )}
+
+  <div ref={messagesEndRef}></div>
+
+</div>
+
+         
 
         <div className="chat-input-container">
   <textarea
@@ -143,7 +216,7 @@ const ChatSection = ({ documentName }) => {
     onClick={handleAsk}
     disabled={loading || !documentName}
   >
-    {loading ? "..." : "➜"}
+    {loading ? "..." : <FiSend />}
   </button>
 </div>
 

@@ -1,3 +1,5 @@
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import React from "react";
 import "./ChatBubble.css";
 
@@ -22,8 +24,12 @@ const ChatBubble = ({ type, message, loading = false }) => {
             <span></span>
           </div>
         ) : (
-          <div className="chat-message">
-            {message}
+          <div className="chat-message markdown-body">
+              <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+              >
+                 {message}
+              </ReactMarkdown>
           </div>
         )}
       </div>
