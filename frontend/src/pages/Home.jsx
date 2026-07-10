@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navbar from "../components/Navbar";
 import UploadBox from "../components/UploadBox";
 import ChatSection from "../components/ChatSection";
 
@@ -6,15 +7,22 @@ function Home() {
   const [documentName, setDocumentName] = useState("");
 
   return (
-    <div className="home">
-      <h1>📄 DocuMind AI</h1>
+    <>
+      <Navbar />
 
-      <p>Upload a PDF and ask questions using AI.</p>
+      <div className="home">
+        <h1>Chat with your PDF using AI</h1>
 
-      <UploadBox setDocumentName={setDocumentName} />
+        <p>
+          Upload any PDF document and ask questions using
+          Retrieval-Augmented Generation powered by Gemini.
+        </p>
 
-      <ChatSection documentName={documentName} />
-    </div>
+        <UploadBox setDocumentName={setDocumentName} />
+
+        <ChatSection documentName={documentName} />
+      </div>
+    </>
   );
 }
 
