@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import api from "../services/api";
 import "./UploadBox.css";
 
-const UploadBox = ({ setDocumentName }) => {
+const UploadBox = ({ setDocumentName ,setPdfUrl,}) => {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -28,6 +28,8 @@ const UploadBox = ({ setDocumentName }) => {
     }
 
     setFile(selectedFile);
+    setPdfUrl(URL.createObjectURL(selectedFile)
+);
   };
 
   const handleFileChange = (e) => {

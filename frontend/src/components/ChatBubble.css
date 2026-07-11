@@ -252,6 +252,50 @@
 .chat-bubble{
 animation:fadeIn .35s ease;
 }
+.message-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.copy-button,
+.read-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 18px;
+
+  min-width: 120px;
+  height: 46px;
+
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+
+  background: #111827;
+  color: #f8fafc;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+.copy-button:hover,
+.read-button:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.copy-button:active,
+.read-button:active {
+  transform: scale(0.98);
+}
 
 @keyframes fadeIn{
 
@@ -264,5 +308,6 @@ to{
 opacity:1;
 transform:translateY(0);
 }
+
 
 }

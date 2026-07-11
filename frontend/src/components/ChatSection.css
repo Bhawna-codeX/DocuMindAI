@@ -1,6 +1,47 @@
 /* =========================
    Chat Section
 ========================= */
+/* =========================
+   Chat Header
+========================= */
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.new-chat-button {
+  padding: 10px 18px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--primary-hover)
+  );
+
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.new-chat-button:hover {
+  transform: translateY(-2px);
+}
+
+.new-chat-button:active {
+  transform: scale(0.98);
+}
 
 .chat-section {
   width: 100%;
@@ -266,6 +307,8 @@ max-height:350px;
 .sources{
 margin-left:0;
 }
+
+
 /* =========================
    Empty Chat
 ========================= */
@@ -377,5 +420,63 @@ border-radius:20px;
 .sources-list::-webkit-scrollbar-track{
 background:transparent;
 }
+}
+/* =========================
+   Header Buttons
+========================= */
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Common style for both buttons */
+
+
+.export-button {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 18px;
+
+  min-width: 155px;
+  height: 42px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--primary-hover)
+  );
+
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all .25s ease;
+
+  box-shadow: var(--shadow);
+}
+
+
+.export-button:hover {
+
+  transform: translateY(-2px);
+
+}
+
+
+.export-button:active {
+
+  transform: scale(.98);
 
 }

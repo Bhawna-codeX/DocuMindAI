@@ -3,9 +3,13 @@ import "./Home.css";
 import Navbar from "../components/Navbar";
 import UploadBox from "../components/UploadBox";
 import ChatSection from "../components/ChatSection";
+import PdfPreview from "../components/PdfPreview";
 
 function Home({ theme, toggleTheme }) {
   const [documentName, setDocumentName] = useState("");
+  const [pdfUrl, setPdfUrl] = useState(null);
+ 
+  
 
   return (
     <>
@@ -26,12 +30,23 @@ function Home({ theme, toggleTheme }) {
 
         <section className="dashboard">
           <div className="upload-panel">
-            <UploadBox setDocumentName={setDocumentName} />
-          </div>
+  <UploadBox
+    setDocumentName={setDocumentName}
+    setPdfUrl={setPdfUrl}
+  />
 
-          <div className="chat-panel">
-            <ChatSection documentName={documentName} />
-          </div>
+  <PdfPreview
+    pdfUrl={pdfUrl}
+    
+  />
+</div>
+
+<div className="chat-panel">
+  <ChatSection
+    documentName={documentName}
+    
+  />
+</div>
         </section>
       </main>
     </>
