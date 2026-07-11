@@ -201,7 +201,7 @@ const updateLastAIMessage = (text) => {
 
     try {
       const response = await axios.post(
-          "https://documind-ai-backend-6et6.onrender.com",
+          "https://documind-ai-backend-6et6.onrender.com/chat/",
         {
             question: currentQuestion,
             document_name: documentName,
