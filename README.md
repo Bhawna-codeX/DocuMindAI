@@ -238,31 +238,43 @@ https://render.com
 
 # 📸 Screenshots
 
-### Home Page
+## 🏠 Home Page
 
-```
-assets/home.png
-```
-
-### Chat Interface
-
-```
-assets/chat.png
-```
-
-### PDF Upload
-
-```
-assets/upload.png
-```
-
-### Dark Mode
-
-```
-assets/darkmode.png
-```
+<p align="center">
+  <img src="assets/home.png" width="900">
+</p>
 
 ---
+
+## 📄 Upload PDF
+
+<p align="center">
+  <img src="assets/uploads.png" width="900">
+</p>
+
+---
+
+## 📖 PDF Preview
+
+<p align="center">
+  <img src="assets/preview.png" width="900">
+</p>
+
+---
+
+## 💬 AI Chat
+
+<p align="center">
+  <img src="assets/chat.png" width="900">
+</p>
+
+---
+
+## 🌙 Dark Mode
+
+<p align="center">
+  <img src="assets/darkmode.png" width="900">
+</p>
 
 # 🎯 Future Enhancements
 
