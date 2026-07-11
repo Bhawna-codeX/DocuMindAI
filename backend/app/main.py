@@ -9,13 +9,18 @@ app = FastAPI(
 )
 
 # Allow React frontend to communicate with FastAPI
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://docu-mind-ai-rosy.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+   
 
 app.include_router(upload.router)
 app.include_router(chat.router)
