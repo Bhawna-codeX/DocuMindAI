@@ -31,9 +31,16 @@ class AnswerGenerationError(Exception):
     pass
 
 
-GEMINI_CHAT_MODEL = "gemini-2.5-flash"
+GEMINI_CHAT_MODEL = "gemini-3.5-flash"
 NOT_FOUND_MESSAGE = "I couldn't find that information in the uploaded document."
 DEFAULT_TOP_K = 5
+# ----------------------------
+# Conversation Memory
+# ----------------------------
+
+MAX_HISTORY = 10
+
+conversation_history: Dict[str, List[Dict[str, str]]] = {}
 
 
 def _load_api_key() -> str:
@@ -47,6 +54,28 @@ def _load_api_key() -> str:
 def _build_client() -> genai.Client:
     """Fresh client per call — no module-level global state."""
     return genai.Client(api_key=_load_api_key())
+
+def get_history(session_id: str):
+    return conversation_history.get(session_id, [])
+
+
+def update_history(session_id: str, question: str, answer: str):
+
+    history = conversation_history.get(session_id, [])
+
+    history.append({
+        "role": "user",
+        "content": question,
+    })
+
+    history.append({
+        "role": "assistant",
+        "content": answer,
+    })
+
+    history = history[-MAX_HISTORY:]
+
+    conversation_history[session_id] = history
 
 
 def retrieve_relevant_chunks(question: str,document_name: str, top_k: int = DEFAULT_TOP_K) -> List[Dict[str, object]]:
@@ -76,7 +105,7 @@ def retrieve_relevant_chunks(question: str,document_name: str, top_k: int = DEFA
     return matches
 
 
-def _build_prompt(question: str, context_chunks: List[Dict[str, object]]) -> str:
+def _build_prompt(question: str, context_chunks: List[Dict[str, object]],history: List[Dict[str, str]],) -> str:
     """Assemble a strict, context-grounded prompt."""
     context_sections = []
     for chunk in context_chunks:
@@ -87,23 +116,70 @@ def _build_prompt(question: str, context_chunks: List[Dict[str, object]]) -> str
 
     context_block = "\n\n---\n\n".join(context_sections)
 
-    return (
-        "You are a document question-answering assistant. "
-        "Answer the question using ONLY the information in the context below. "
-        "Do not use any outside knowledge. "
-        f'If the answer is not present in the context, respond exactly with: "{NOT_FOUND_MESSAGE}"\n\n'
-        f"Context:\n{context_block}\n\n"
-        f"Question: {question}\n\n"
-        "Answer:"
-    )
+    history_text = ""
+
+    for message in history:
+
+        history_text += (
+            f"{message['role'].capitalize()}: "
+            f"{message['content']}\n"
+        )
+
+    return f"""
+    You are DocuMind AI, an intelligent PDF document assistant.
+
+    Your task is to answer ONLY using the information provided in the document context.
+
+    IMPORTANT RULES
+
+    1. Never use outside knowledge.
+    2. Never guess.
+    3. If the answer is not present, reply exactly:
+
+    {NOT_FOUND_MESSAGE}
+
+    4. Write in clean Markdown.
+    5. Use headings where appropriate.
+    6. Use bullet points whenever listing information.
+    7. Keep answers concise but complete.
+    8. If the answer comes from a specific page, naturally mention the page number.
+    9. If the question asks for a summary, provide a structured summary instead of one long paragraph.
+
+    -------------------------
+    CONVERSATION HISTORY
+    -------------------------
+
+    {history_text}
+    -------------------------
+    DOCUMENT CONTEXT
+    -------------------------
+
+    {context_block}
+
+    -------------------------
+    USER QUESTION
+    -------------------------
+
+    {question}
+
+    -------------------------
+    ANSWER
+    -------------------------
+    """
 
 
-def generate_answer(question: str, context_chunks: List[Dict[str, object]]) -> str:
+def generate_answer(question: str, context_chunks: List[Dict[str, object]],session_id: str,) -> str:
     """Generate an answer with Gemini 2.5 Flash, grounded strictly in context_chunks."""
     if not context_chunks:
         return NOT_FOUND_MESSAGE
 
-    prompt = _build_prompt(question, context_chunks)
+    history = get_history(session_id)
+
+    prompt = _build_prompt(
+        question,
+        context_chunks,
+        history,
+    )
     client = _build_client()
 
     try:
@@ -121,11 +197,15 @@ def generate_answer(question: str, context_chunks: List[Dict[str, object]]) -> s
     return answer_text.strip()
 
 
-def ask_question(question: str,document_name: str, top_k: int = DEFAULT_TOP_K) -> Dict[str, object]:
+def ask_question(question: str,document_name: str,session_id: str, top_k: int = DEFAULT_TOP_K) -> Dict[str, object]:
     """End-to-end RAG entry point: retrieve -> generate -> return question/answer/sources."""
     context_chunks = retrieve_relevant_chunks(question,document_name, top_k=top_k)
-    answer = generate_answer(question, context_chunks)
-
+    answer = generate_answer(question, context_chunks,session_id,)
+    update_history(
+        session_id,
+        question,
+        answer,
+    )
     sources = [
         {
             "source_document": chunk.get("source_document"),
